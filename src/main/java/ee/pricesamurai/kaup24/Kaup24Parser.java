@@ -4,12 +4,10 @@ import ee.pricesamurai.Product;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,10 +19,9 @@ public class Kaup24Parser {
     private List<Product> kaup24products = new ArrayList<>();
 
     private void addAllToUrlList() {
-        try (Stream<String> stream = Files.lines(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("kaup24/url.txt")).toURI()))) {
+        try (Stream<String> stream = Files.lines(Paths.get("src/main/resources/kaup24/url.txt"))) {
             url = stream.collect(Collectors.toList());
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

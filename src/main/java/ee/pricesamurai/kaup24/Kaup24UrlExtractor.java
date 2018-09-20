@@ -4,13 +4,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Kaup24UrlExtractor {
@@ -27,10 +25,9 @@ public class Kaup24UrlExtractor {
         productsUrl = aElements.stream().map(element -> element.attr("href")).collect(Collectors.toList());
     }
 
-    public void writeUrlToFile() throws IOException, URISyntaxException {
+    public void writeUrlToFile() throws IOException {
         extractUrlPromPage();
-        Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("kaup24/url.txt")).toURI());
+        Path path = Paths.get("src/main/resources/kaup24/url.txt");
         productsUrl.forEach(url -> {
             try {
                 String urlWithNewLine = url + System.lineSeparator();
