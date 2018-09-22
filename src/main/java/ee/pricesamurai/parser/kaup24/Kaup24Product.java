@@ -1,13 +1,13 @@
-package ee.pricesamurai.kaup24;
+package ee.pricesamurai.parser.kaup24;
 
-import ee.pricesamurai.Product;
+import ee.pricesamurai.parser.Product;
 
 public class Kaup24Product extends Product {
 
     private double coupon;
 
-    public Kaup24Product(String id, String name, double price, String url) {
-        super(id, name, price, url);
+    public Kaup24Product(String name, float price, String url) {
+        super(name, price, url);
     }
 
     public double getCoupon() {

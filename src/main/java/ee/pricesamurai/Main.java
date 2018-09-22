@@ -1,21 +1,16 @@
 package ee.pricesamurai;
 
-import ee.pricesamurai.kaup24.Kaup24Parser;
-import ee.pricesamurai.kaup24.Kaup24UrlExtractor;
+import ee.pricesamurai.database.DBConnection;
+import ee.pricesamurai.parser.kaup24.Kaup24Parser;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-
-        // Parse all URLs from page
-        Kaup24UrlExtractor kaup24UrlExtractor = new Kaup24UrlExtractor();
-        kaup24UrlExtractor.writeUrlToFile();
-
-        // Parse information from each URL
+    public static void main(String[] args) throws SQLException {
+        DBConnection dbConnection = new DBConnection();
         Kaup24Parser kaup24Parser = new Kaup24Parser();
-        kaup24Parser.getKaup24products();
+        kaup24Parser.getKaup24products(dbConnection.getConnection());
+        dbConnection.getConnection().close();
     }
 }

@@ -1,28 +1,22 @@
-package ee.pricesamurai;
+package ee.pricesamurai.parser;
 
 public class Product {
 
-    private String id;
     private String name;
-    private double price;
+    private float price;
     private String url;
 
-    public Product(String id, String name, double price, String url) {
-        this.id = id;
+    public Product(String name, float price, String url) {
         this.name = name;
         this.price = price;
         this.url = url;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 

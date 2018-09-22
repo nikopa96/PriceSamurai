@@ -77,10 +77,6 @@ fabric.properties
 .idea/httpRequests
 
 .gradle/
-.idea/.name
-.idea/gradle.xml
-.idea/misc.xml
-.idea/vcs.xml
-.idea/workspace.xml
+.idea/
 gradle/
 /build/*
