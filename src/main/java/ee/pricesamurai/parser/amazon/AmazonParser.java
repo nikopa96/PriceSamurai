@@ -23,6 +23,8 @@ public class AmazonParser {
         for (int i = 0; i < 10; i++) {
             document = Jsoup.connect(nextAmazonUrl).get();
 
+            System.out.println(nextAmazonUrl);
+
             if (document.getElementById("olpOfferListColumn").html().contains("img alt=\"Amazon.de\"")) {
                 return document;
             } else {

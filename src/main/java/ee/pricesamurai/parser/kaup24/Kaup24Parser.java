@@ -3,6 +3,7 @@ package ee.pricesamurai.parser.kaup24;
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.DomNotFoundException;
 import ee.pricesamurai.parser.Product;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;

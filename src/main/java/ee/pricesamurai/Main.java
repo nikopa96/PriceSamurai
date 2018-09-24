@@ -4,6 +4,7 @@ import ee.pricesamurai.database.DBConnection;
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.amazon.AmazonParser;
 import ee.pricesamurai.parser.kaup24.Kaup24Parser;
+import ee.pricesamurai.parser.oneA.OneAParser;
 
 import java.sql.SQLException;
 
@@ -16,8 +17,11 @@ public class Main {
 //        Kaup24Parser kaup24Parser = new Kaup24Parser();
 //        kaup24Parser.runParser(databaseController);
 
-        AmazonParser amazonParser = new AmazonParser();
-        amazonParser.runParser(databaseController);
+//        AmazonParser amazonParser = new AmazonParser();
+//        amazonParser.runParser(databaseController);
+
+        OneAParser oneAParser = new OneAParser();
+        oneAParser.runParser(databaseController);
 
         dbConnection.getConnection().close();
     }
