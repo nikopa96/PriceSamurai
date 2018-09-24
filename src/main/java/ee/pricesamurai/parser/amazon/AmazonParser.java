@@ -3,6 +3,7 @@ package ee.pricesamurai.parser.amazon;
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.DomNotFoundException;
 import ee.pricesamurai.parser.Product;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,13 +24,11 @@ public class AmazonParser {
         for (int i = 0; i < 10; i++) {
             document = Jsoup.connect(nextAmazonUrl).get();
 
-            System.out.println(nextAmazonUrl);
-
             if (document.getElementById("olpOfferListColumn").html().contains("img alt=\"Amazon.de\"")) {
                 return document;
             } else {
                 increment = increment + 10;
-                nextAmazonUrl = url + "&startIndex=" + String.valueOf(increment);
+                nextAmazonUrl = url + "/ref=olp_f_new?ie=UTF8&f_new=true&startIndex=" + String.valueOf(increment);
             }
         }
 
@@ -44,24 +43,26 @@ public class AmazonParser {
                 Document document = getHtmlContainingAmazonOffer(productUrl);
                 Elements divElements = document.getElementsByClass("olpOffer");
 
+                String name = document.getElementById("olpProductDetails").getElementsByTag("h1")
+                        .get(0)
+                        .text();
+                String price = "";
+
                 for (Element element : divElements) {
                     if (element.getElementsByClass("olpSellerName").html().contains("img alt=\"Amazon.de\"")) {
-                        String name = document.getElementById("olpProductDetails").getElementsByTag("h1")
-                                .get(0)
-                                .text();
-                        String price = element.getElementsByClass("olpOfferPrice").get(0).text();
+                        price = element.getElementsByClass("olpOfferPrice").get(0).text();
 
-                        if (!name.isEmpty() && !price.isEmpty()) {
-                            float formattedPrice = Float.parseFloat(price.replace("EUR ", "")
-                                    .replace(",", "."));
-                            amazonProducts.add(new Product(name, formattedPrice, productUrl));
-                        } else {
-                            throw new DomNotFoundException("Cannot find URL or DOM element");
-                        }
+                        float formattedPrice = Float.parseFloat(price.replace("EUR ", "")
+                                .replace(",", "."));
+                        amazonProducts.add(new Product(name, formattedPrice, productUrl));
                     }
                 }
+
+                if (name.isEmpty() || price.isEmpty()) {
+                    throw new DomNotFoundException("Cannot find DOM element");
+                }
             } catch (IOException | DomNotFoundException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }
         }
 
