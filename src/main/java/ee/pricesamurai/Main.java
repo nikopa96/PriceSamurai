@@ -14,11 +14,11 @@ public class Main {
         DBConnection dbConnection = new DBConnection();
         DatabaseController databaseController = new DatabaseController(dbConnection.getConnection());
 
-//        Kaup24Parser kaup24Parser = new Kaup24Parser();
-//        kaup24Parser.runParser(databaseController);
+        Kaup24Parser kaup24Parser = new Kaup24Parser();
+        kaup24Parser.runParser(databaseController);
 
-//        AmazonParser amazonParser = new AmazonParser();
-//        amazonParser.runParser(databaseController);
+        AmazonParser amazonParser = new AmazonParser();
+        amazonParser.runParser(databaseController);
 
         OneAParser oneAParser = new OneAParser();
         oneAParser.runParser(databaseController);

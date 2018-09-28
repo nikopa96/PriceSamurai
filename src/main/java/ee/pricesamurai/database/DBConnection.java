@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String DB_PATH = "jdbc:postgresql://localhost:5432/samuraiParser";
+    private static final String DB_PATH = "jdbc:postgresql://104.248.132.55:5432/pricesamurai";
     private static final String USERNAME = "postgres";
-    private static final String PASSWORD = "root";
+    private static final String PASSWORD = "pricesamurai28092018";
 
     private Connection connection;
 

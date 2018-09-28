@@ -11,8 +11,28 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
+}
+
+
 dependencies {
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    extraLibs group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    extraLibs group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    configurations.compile.extendsFrom(configurations.extraLibs)
+}
+
+jar {
+    baseName = 'pricesamurai'
+    version =  '1'
+    manifest {
+        attributes(
+                'Main-Class': 'ee.pricesamurai.Main'
+        )
+    }
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
