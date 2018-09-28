@@ -1,4 +1,4 @@
-package ee.pricesamurai.parser;
+package ee.pricesamurai.parser.model;
 
 public class Product {
 

@@ -10,3 +10,10 @@ CREATE TABLE Product (
   price decimal NOT NULL,
   url varchar(255) NOT NULL
 );
+
+CREATE TABLE Kaup24 (
+  id SERIAL PRIMARY KEY,
+  product_name varchar(255) REFERENCES Product (name) NOT NULL,
+  coupon_discount integer NOT NULL,
+  coupon_min_sum integer NOT NULL
+);

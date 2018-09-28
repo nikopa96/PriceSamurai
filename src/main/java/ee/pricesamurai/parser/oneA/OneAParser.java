@@ -1,8 +1,9 @@
 package ee.pricesamurai.parser.oneA;
 
 import ee.pricesamurai.database.DatabaseController;
-import ee.pricesamurai.parser.DomNotFoundException;
-import ee.pricesamurai.parser.Product;
+import ee.pricesamurai.parser.model.DomNotFoundException;
+import ee.pricesamurai.parser.model.Parser;
+import ee.pricesamurai.parser.model.Product;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -12,7 +13,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OneAParser {
+public class OneAParser implements Parser {
+
+    private int errorsCounter;
+
+    public OneAParser(int errorsCounter) {
+        this.errorsCounter = errorsCounter;
+    }
 
     private float formatPrice(Elements priceRaw) {
         String euros = priceRaw.get(0).html()
@@ -43,6 +50,7 @@ public class OneAParser {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
             } catch (IOException | DomNotFoundException e) {
+                this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }
         }
@@ -50,6 +58,11 @@ public class OneAParser {
         return oneAProducts;
     }
 
+    public int getErrorsCounter() {
+        return errorsCounter;
+    }
+
+    @Override
     public void runParser(DatabaseController databaseController) throws SQLException {
         List<String> oneAUrlList = databaseController.fetchUrlFromDatabase("1a.ee");
         List<Product> oneAProducts = parseAndCreateProducts(oneAUrlList);

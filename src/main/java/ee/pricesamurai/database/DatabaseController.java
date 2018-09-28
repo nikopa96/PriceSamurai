@@ -1,6 +1,6 @@
 package ee.pricesamurai.database;
 
-import ee.pricesamurai.parser.Product;
+import ee.pricesamurai.parser.model.Product;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

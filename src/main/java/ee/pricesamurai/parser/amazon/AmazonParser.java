@@ -1,8 +1,9 @@
 package ee.pricesamurai.parser.amazon;
 
 import ee.pricesamurai.database.DatabaseController;
-import ee.pricesamurai.parser.DomNotFoundException;
-import ee.pricesamurai.parser.Product;
+import ee.pricesamurai.parser.model.DomNotFoundException;
+import ee.pricesamurai.parser.model.Parser;
+import ee.pricesamurai.parser.model.Product;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +15,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmazonParser {
+public class AmazonParser implements Parser {
+
+    private int errorsCounter;
+
+    public AmazonParser(int errorsCounter) {
+        this.errorsCounter = errorsCounter;
+    }
 
     private Document getHtmlContainingAmazonOffer(String url) throws IOException {
         Document document = null;
@@ -62,6 +69,7 @@ public class AmazonParser {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
             } catch (IOException | DomNotFoundException e) {
+                this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }
         }
@@ -69,6 +77,11 @@ public class AmazonParser {
         return amazonProducts;
     }
 
+    public int getErrorsCounter() {
+        return errorsCounter;
+    }
+
+    @Override
     public void runParser(DatabaseController databaseController) throws SQLException {
         List<String> amazonUrlList = databaseController.fetchUrlFromDatabase("amazon.de");
         List<Product> amazonProduct = parseAndCreateProducts(amazonUrlList);
