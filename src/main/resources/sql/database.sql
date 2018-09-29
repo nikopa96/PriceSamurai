@@ -13,7 +13,7 @@ CREATE TABLE Product (
 
 CREATE TABLE Kaup24 (
   id SERIAL PRIMARY KEY,
-  product_name varchar(255) REFERENCES Product (name) NOT NULL,
-  coupon_discount integer NOT NULL,
-  coupon_min_sum integer NOT NULL
+  product_id integer REFERENCES Product (id) NOT NULL,
+  coupon_discount decimal NOT NULL,
+  coupon_min_sum decimal NOT NULL
 );

@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Kaup24Parser implements Parser {
@@ -20,6 +21,23 @@ public class Kaup24Parser implements Parser {
 
     public Kaup24Parser(int errorsCounter) {
         this.errorsCounter = errorsCounter;
+    }
+
+    private List<Float> parseCoupon(Elements elements, String productUrl) {
+        List<Float> coupons = new ArrayList<>();
+
+        try {
+            String rawCoupon = elements.get(0).getElementsMatchingText("soodustus alates").get(0).text();
+            List<String> rawCouponElements = Arrays.asList(rawCoupon.split(" "));
+
+            float couponDiscount = Float.parseFloat(rawCouponElements.get(0).replaceAll("\\u20AC", ""));
+            float couponMinSum = Float.parseFloat(rawCouponElements.get(3).replaceAll("\\u20AC", ""));
+            coupons = Arrays.asList(couponDiscount, couponMinSum);
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            System.out.println(e.getMessage() + " No coupon: " + productUrl);
+        }
+
+        return coupons;
     }
 
     private List<Product> parseAndCreateProducts(List<String> kaup24UrlList) {
@@ -35,13 +53,20 @@ public class Kaup24Parser implements Parser {
 
                 if (!name.isEmpty() && !price.isEmpty()) {
                     Elements elements = document.getElementsByAttributeValue("widget-attachpoint", "globalBadgeTitle");
+                    List<Float> coupons = parseCoupon(elements, productUrl);
 
-                    Product kaup24product = new Kaup24Product(name, Float.parseFloat(price), productUrl);
+                    Kaup24Product kaup24product = new Kaup24Product(name, Float.parseFloat(price), productUrl);
+
+                    if (!coupons.isEmpty()) {
+                        kaup24product.setCouponDiscount(coupons.get(0));
+                        kaup24product.setCouponMinSum(coupons.get(1));
+                    }
+
                     kaup24products.add(kaup24product);
                 } else {
                     throw new DomNotFoundException("Cannot find URL or DOM element");
                 }
-            } catch (IOException | DomNotFoundException| NumberFormatException e) {
+            } catch (IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }
