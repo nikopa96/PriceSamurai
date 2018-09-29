@@ -41,7 +41,7 @@ public class Kaup24Parser implements Parser {
                 } else {
                     throw new DomNotFoundException("Cannot find URL or DOM element");
                 }
-            } catch (IOException | DomNotFoundException e) {
+            } catch (IOException | DomNotFoundException| NumberFormatException e) {
                 this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }

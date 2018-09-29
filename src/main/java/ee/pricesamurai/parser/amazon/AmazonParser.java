@@ -68,7 +68,7 @@ public class AmazonParser implements Parser {
                 if (name.isEmpty() || price.isEmpty()) {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
-            } catch (IOException | DomNotFoundException e) {
+            } catch (IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }

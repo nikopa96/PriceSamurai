@@ -23,7 +23,7 @@ public class OneAParser implements Parser {
 
     private float formatPrice(Elements priceRaw) {
         String euros = priceRaw.get(0).html()
-                .replace("<sub>€</sub>", "")
+                .replaceAll("<sub>\\u20AC</sub>", "")
                 .replaceAll("<sup>\\d+</sup>", "")
                 .replaceAll("\\n", "");
 
@@ -49,7 +49,7 @@ public class OneAParser implements Parser {
                 } else {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
-            } catch (IOException | DomNotFoundException e) {
+            } catch (IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
                 System.out.println(e.getMessage() + " REQUEST: " + productUrl);
             }
