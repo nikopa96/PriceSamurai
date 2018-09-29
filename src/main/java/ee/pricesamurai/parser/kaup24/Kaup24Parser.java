@@ -34,6 +34,7 @@ public class Kaup24Parser implements Parser {
             float couponMinSum = Float.parseFloat(rawCouponElements.get(3).replaceAll("\\u20AC", ""));
             coupons = Arrays.asList(couponDiscount, couponMinSum);
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            this.errorsCounter++;
             System.out.println(e.getMessage() + " No coupon: " + productUrl);
         }
 
