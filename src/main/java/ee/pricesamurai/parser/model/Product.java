@@ -5,11 +5,13 @@ public class Product {
     private String name;
     private float price;
     private String url;
+    private Integer itemId;
 
-    public Product(String name, float price, String url) {
+    public Product(String name, float price, String url, Integer itemId) {
         this.name = name;
         this.price = price;
         this.url = url;
+        this.itemId = itemId;
     }
 
     public String getName() {
@@ -22,5 +24,9 @@ public class Product {
 
     public String getUrl() {
         return url;
+    }
+
+    public Integer getItemId() {
+        return itemId;
     }
 }

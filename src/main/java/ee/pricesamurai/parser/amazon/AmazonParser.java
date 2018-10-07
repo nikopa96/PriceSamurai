@@ -2,6 +2,7 @@ package ee.pricesamurai.parser.amazon;
 
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.model.DomNotFoundException;
+import ee.pricesamurai.parser.model.Item;
 import ee.pricesamurai.parser.model.Parser;
 import ee.pricesamurai.parser.model.Product;
 
@@ -42,12 +43,12 @@ public class AmazonParser implements Parser {
         return document;
     }
 
-    private List<Product> parseAndCreateProducts(List<String> amazonUrlList) {
+    private List<Product> parseAndCreateProducts(List<Item> amazonRawItemList) {
         List<Product> amazonProducts = new ArrayList<>();
 
-        for (String productUrl : amazonUrlList) {
+        for (Item rawItem : amazonRawItemList) {
             try {
-                Document document = getHtmlContainingAmazonOffer(productUrl);
+                Document document = getHtmlContainingAmazonOffer(rawItem.getUrl());
                 Elements divElements = document.getElementsByClass("olpOffer");
 
                 String name = document.getElementById("olpProductDetails").getElementsByTag("h1")
@@ -61,16 +62,16 @@ public class AmazonParser implements Parser {
 
                         float formattedPrice = Float.parseFloat(price.replace("EUR ", "")
                                 .replace(",", "."));
-                        amazonProducts.add(new Product(name, formattedPrice, productUrl));
+                        amazonProducts.add(new Product(name, formattedPrice, rawItem.getUrl(), rawItem.getItemId()));
                     }
                 }
 
                 if (name.isEmpty() || price.isEmpty()) {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
-            } catch (IOException | DomNotFoundException | NumberFormatException e) {
+            } catch (IndexOutOfBoundsException | IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
-                System.out.println(e.getMessage() + " REQUEST: " + productUrl);
+                System.out.println(e.getMessage() + " REQUEST: " + rawItem.getUrl());
             }
         }
 
@@ -83,8 +84,8 @@ public class AmazonParser implements Parser {
 
     @Override
     public void runParser(DatabaseController databaseController) throws SQLException {
-        List<String> amazonUrlList = databaseController.fetchUrlFromDatabase("amazon.de");
-        List<Product> amazonProduct = parseAndCreateProducts(amazonUrlList);
+        List<Item> amazonRawItemList = databaseController.fetchUrlFromDatabase("amazon.de");
+        List<Product> amazonProduct = parseAndCreateProducts(amazonRawItemList);
 
         databaseController.addProductsToDatabase(amazonProduct);
     }

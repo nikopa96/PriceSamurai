@@ -17,3 +17,8 @@ CREATE TABLE Kaup24 (
   coupon_discount decimal NOT NULL,
   coupon_min_sum decimal NOT NULL
 );
+
+ALTER TABLE Pages ADD COLUMN item_id smallint;
+ALTER TABLE Pages ALTER COLUMN item_id SET NOT NULL;
+
+ALTER TABLE Product ADD COLUMN item_id smallint;

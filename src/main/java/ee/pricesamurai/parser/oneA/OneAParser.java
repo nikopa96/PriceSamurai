@@ -2,6 +2,7 @@ package ee.pricesamurai.parser.oneA;
 
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.model.DomNotFoundException;
+import ee.pricesamurai.parser.model.Item;
 import ee.pricesamurai.parser.model.Parser;
 import ee.pricesamurai.parser.model.Product;
 import org.jsoup.Jsoup;
@@ -32,12 +33,12 @@ public class OneAParser implements Parser {
         return Float.parseFloat(euros + "." + cents);
     }
 
-    private List<Product> parseAndCreateProducts(List<String> oneAUrlList) {
+    private List<Product> parseAndCreateProducts(List<Item> oneARawItemList) {
         List<Product> oneAProducts = new ArrayList<>();
 
-        for (String productUrl : oneAUrlList) {
+        for (Item rawItem : oneARawItemList) {
             try {
-                Document document = Jsoup.connect(productUrl).get();
+                Document document = Jsoup.connect(rawItem.getUrl()).get();
                 String name = document.getElementsByClass("product-main-info").get(0)
                         .getElementsByTag("h1").get(0).text();
                 Elements priceRaw = document.getElementsByClass("price-holder").get(0)
@@ -45,13 +46,13 @@ public class OneAParser implements Parser {
 
                 if (!name.isEmpty() && !priceRaw.isEmpty()) {
                     float formattedPrice = formatPrice(priceRaw);
-                    oneAProducts.add(new Product(name, formattedPrice, productUrl));
+                    oneAProducts.add(new Product(name, formattedPrice, rawItem.getUrl(), rawItem.getItemId()));
                 } else {
                     throw new DomNotFoundException("Cannot find DOM element");
                 }
-            } catch (IOException | DomNotFoundException | NumberFormatException e) {
+            } catch (IndexOutOfBoundsException | IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
-                System.out.println(e.getMessage() + " REQUEST: " + productUrl);
+                System.out.println(e.getMessage() + " REQUEST: " + rawItem.getUrl());
             }
         }
 
@@ -64,8 +65,8 @@ public class OneAParser implements Parser {
 
     @Override
     public void runParser(DatabaseController databaseController) throws SQLException {
-        List<String> oneAUrlList = databaseController.fetchUrlFromDatabase("1a.ee");
-        List<Product> oneAProducts = parseAndCreateProducts(oneAUrlList);
+        List<Item> oneARawItemList = databaseController.fetchUrlFromDatabase("1a.ee");
+        List<Product> oneAProducts = parseAndCreateProducts(oneARawItemList);
 
         databaseController.addProductsToDatabase(oneAProducts);
     }

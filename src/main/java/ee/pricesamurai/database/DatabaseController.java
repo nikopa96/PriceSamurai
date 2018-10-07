@@ -1,6 +1,7 @@
 package ee.pricesamurai.database;
 
 import ee.pricesamurai.parser.kaup24.Kaup24Product;
+import ee.pricesamurai.parser.model.Item;
 import ee.pricesamurai.parser.model.Product;
 
 import java.sql.*;
@@ -15,22 +16,23 @@ public class DatabaseController {
         this.connection = connection;
     }
 
-    public List<String> fetchUrlFromDatabase(String webStore) throws SQLException {
-        List<String> webStoreUrlList = new ArrayList<>();
+    public List<Item> fetchUrlFromDatabase(String webStore) throws SQLException {
+        List<Item> webStoreItemList = new ArrayList<>();
 
-        String sqlRequest = "SELECT * FROM pages WHERE url LIKE ?";
+        String sqlRequest = "SELECT url, item_id FROM pages WHERE url LIKE ?";
         PreparedStatement preparedStatement = connection.prepareStatement(sqlRequest);
         preparedStatement.setString(1, "%" + webStore + "%");
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
-            String url = resultSet.getString("url");
-            webStoreUrlList.add(url);
+            Item item = new Item(resultSet.getString("url"),
+                    Integer.parseInt(resultSet.getString("item_id")));
+            webStoreItemList.add(item);
         }
         preparedStatement.close();
 
-        return webStoreUrlList;
+        return webStoreItemList;
     }
 
     private void addKaup24ProductToDatabase(PreparedStatement preparedStatement,
@@ -53,16 +55,18 @@ public class DatabaseController {
     }
 
     public void addProductsToDatabase(List<Product> products) {
-        String productSqlRequest = "INSERT INTO product(name, price, url) VALUES(?, ?, ?)";
+        String productSqlRequest = "INSERT INTO product(name, price, url, item_id) VALUES(?, ?, ?, ?)";
         String kaup24SqlRequest = "INSERT INTO kaup24(product_id, coupon_discount, coupon_min_sum) VALUES(?, ?, ?)";
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(productSqlRequest, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = connection.prepareStatement(productSqlRequest,
+                    Statement.RETURN_GENERATED_KEYS);
             PreparedStatement statementForKaup24 = connection.prepareStatement(kaup24SqlRequest);
 
             for (Product product : products) {
                 preparedStatement.setString(1, product.getName());
                 preparedStatement.setFloat(2, product.getPrice());
                 preparedStatement.setString(3, product.getUrl());
+                preparedStatement.setInt(4, product.getItemId());
                 preparedStatement.execute();
 
                 addKaup24ProductToDatabase(preparedStatement, statementForKaup24, product);

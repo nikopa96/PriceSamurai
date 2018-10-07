@@ -2,6 +2,7 @@ package ee.pricesamurai.parser.kaup24;
 
 import ee.pricesamurai.database.DatabaseController;
 import ee.pricesamurai.parser.model.DomNotFoundException;
+import ee.pricesamurai.parser.model.Item;
 import ee.pricesamurai.parser.model.Parser;
 import ee.pricesamurai.parser.model.Product;
 
@@ -41,12 +42,12 @@ public class Kaup24Parser implements Parser {
         return coupons;
     }
 
-    private List<Product> parseAndCreateProducts(List<String> kaup24UrlList) {
+    private List<Product> parseAndCreateProducts(List<Item> kaup24RawItemList) {
         List<Product> kaup24products = new ArrayList<>();
 
-        for (String productUrl : kaup24UrlList) {
+        for (Item rawItem : kaup24RawItemList) {
             try {
-                Document document = Jsoup.connect(productUrl).get();
+                Document document = Jsoup.connect(rawItem.getUrl()).get();
                 String name = document.select("#productPage > section:nth-child(3) > div > h1").get(0).text();
                 String price = document.getElementsByAttributeValue("itemprop", "price")
                         .get(0)
@@ -54,9 +55,10 @@ public class Kaup24Parser implements Parser {
 
                 if (!name.isEmpty() && !price.isEmpty()) {
                     Elements elements = document.getElementsByAttributeValue("widget-attachpoint", "globalBadgeTitle");
-                    List<Float> coupons = parseCoupon(elements, productUrl);
+                    List<Float> coupons = parseCoupon(elements, rawItem.getUrl());
 
-                    Kaup24Product kaup24product = new Kaup24Product(name, Float.parseFloat(price), productUrl);
+                    Kaup24Product kaup24product = new Kaup24Product(name, Float.parseFloat(price),
+                            rawItem.getUrl(), rawItem.getItemId());
 
                     if (!coupons.isEmpty()) {
                         kaup24product.setCouponDiscount(coupons.get(0));
@@ -67,9 +69,9 @@ public class Kaup24Parser implements Parser {
                 } else {
                     throw new DomNotFoundException("Cannot find URL or DOM element");
                 }
-            } catch (IOException | DomNotFoundException | NumberFormatException e) {
+            } catch (IndexOutOfBoundsException | IOException | DomNotFoundException | NumberFormatException e) {
                 this.errorsCounter++;
-                System.out.println(e.getMessage() + " REQUEST: " + productUrl);
+                System.out.println(e.getMessage() + " REQUEST: " + rawItem.getUrl());
             }
         }
 
@@ -82,8 +84,8 @@ public class Kaup24Parser implements Parser {
 
     @Override
     public void runParser(DatabaseController databaseController) throws SQLException {
-        List<String> kaup24UrlList = databaseController.fetchUrlFromDatabase("kaup24.ee");
-        List<Product> kaup24Products = parseAndCreateProducts(kaup24UrlList);
+        List<Item> kaup24RawItemList = databaseController.fetchUrlFromDatabase("kaup24.ee");
+        List<Product> kaup24Products = parseAndCreateProducts(kaup24RawItemList);
 
         databaseController.addProductsToDatabase(kaup24Products);
     }

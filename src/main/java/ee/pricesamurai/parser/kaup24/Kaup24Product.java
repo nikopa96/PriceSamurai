@@ -7,8 +7,8 @@ public class Kaup24Product extends Product {
     private float couponDiscount;
     private float couponMinSum;
 
-    public Kaup24Product(String name, float price, String url) {
-        super(name, price, url);
+    public Kaup24Product(String name, float price, String url, Integer itemId) {
+        super(name, price, url, itemId);
     }
 
     public float getCouponDiscount() {
